@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+	<meta charset="UTF-8">
+	<title>JOIN</title>
+</head>
+
+<body>
+	<div class="register-box">
+		<h2>회원 가입</h2>
+		<input type="text" id="userId" placeholder="아이디 입력" />
+		<input type="password" id="userPw" placeholder="비밀번호 입력" />
+		<input type="text" id="userNm" placeholder="이름 입력" />
+		<input type="text" id="userEmail" placeholder="이메일 입력" />
+		<button id="btn_regist" onclick="registMember()">가입하기</button>
+		<div id="register_message"></div>
+		<div id="member_info"></div>
+		<a th:href="@{/user/login}">로그인으로 이동</a>
+	</div>
+</body>
+<script>
+	function registMember() {
+		var user_id = document.getElementById("userId").value;
+		var user_pw = document.getElementById("userPw").value;
+		var user_name = document.getElementById("userNm").value;
+		var user_email = document.getElementById("userEmail").value;
+
+		if (!user_id || !user_pw || !user_name || !user_email) {
+			alert('모든 필드를 입력해주세요...!');
+			return false;
+		}
+
+		fetch('/user/request-register', {
+			method: 'POST',
+			credentials: 'include',
+			headers: {'Content-Type': 'application/json'},
+			body: JSON.stringify({
+				"userId": user_id,
+				"userPw": user_pw,
+				"userName": user_name,
+				"userEmail": user_email
+			})
+		})
+		.then(response => response.json())
+		.then(data => {
+			if (data.REPL_CD === '0000') { // ===로 비교
+				alert(data.REPL_PAGE_MSG);
+				window.location.href = '/user/login';
+			} else {
+				document.getElementById('register_message').innerHTML = data.REPL_PAGE_MSG;
+			}
+		})
+		.catch(error => {
+			console.error('회원가입 오류 발생', error);
+			document.getElementById('register_message').innerHTML = '회원가입 중 오류가 발생했습니다.';
+		});
+	}
+</script>
+
+</html>

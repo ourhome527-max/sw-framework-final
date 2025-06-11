@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+	<meta charset="UTF-8">
+	<title>회원 상세 페이지</title>
+
+</head>
+
+<body>
+	<div class="member-box">
+		<h2>회원 상세 페이지</h2>
+		<table>
+			<tr>
+				<input type="hidden" id="user_seq" th:value="${result.USER_INFO.user_seq}" />
+				<td>아이디</td>
+				<td th:text="${result.USER_INFO.user_id}"></td>
+				<input type="hidden" id="user_id" th:value="${result.USER_INFO.user_id}" />
+			</tr>
+			<tr>
+				<td>이름</td>
+				<td><input type="text" id="user_name" th:value="${result.USER_INFO.user_nm}" /></td>
+			</tr>
+			<tr>
+				<td>이메일</td>
+				<td><input type="text" id="user_email" th:value="${result.USER_INFO.user_email}" /></td>
+			</tr>
+			<tr>
+				<td>등록일시</td>
+				<td th:text="${result.USER_INFO.reg_dt}"></td>
+			</tr>
+			<tr>
+				<td>수정일시</td>
+				<td th:text="${result.USER_INFO.mod_dt}"></td>
+			</tr>
+		</table>
+	</div>
+
+	<button id="btn_modify" onclick="modifyMember()">수정</button>
+	<button id="btn_delete" onclick="removeMember()">삭제</button>
+</body>
+
+<script>
+
+	// 회원가입 함수
+	function modifyMember() {
+		var user_id = document.getElementById('user_id').value;
+		var user_seq = document.getElementById('user_seq').value;
+		var user_name = document.getElementById('user_name').value;
+		var user_email = document.getElementById('user_email').value;
+
+		if (!user_name || !user_email) {
+			alert('모든 필드를 입력해주세요...!');
+			return false;
+		}
+
+		fetch('/user/modify', {
+			method: 'POST',
+			credentials: 'include',	// 세션과 관련 없는 곳에서는 안써도됨 근데 큰차이가 없음
+			headers: {'Content-Type': 'application/json'},
+			body: JSON.stringify({
+				"userId": user_id,
+				"userSeq": user_seq,
+				"userName": user_name,
+				"userEmail": user_email
+			})
+		})
+			.then(response => response.json())
+			.then(data => {
+				// 회원정보 수정 성공
+				if (data.REPL_CD == '0000') {
+					alert(data.REPL_PAGE_MSG);
+				}
+				// 회원가입 실패
+				else {
+					alert(data.REPL_PAGE_MSG);
+				}
+			})
+			.catch(error => {
+				console.error('회원가입 오류 발생', error);
+			})
+
+	}
+
+	function removeMember() {
+		if (!confirm("삭제 하시겠습니까?")) {
+			return false;
+		}
+
+		var user_seq = document.getElementById('user_seq').value;
+
+
+		fetch('/user/delete', {
+			method: 'POST',
+			credentials: 'include',	// 세션과 관련 없는 곳에서는 안써도됨 근데 큰차이가 없음
+			headers: {'Content-Type': 'application/json'},
+			body: JSON.stringify({
+				"userSeq": user_seq,
+			})
+		})
+			.then(response => response.json())
+			.then(data => {
+				// 회원정보 수정 성공
+				if (data.REPL_CD == '0000') {
+					alert(data.REPL_PAGE_MSG);
+					window.location.href = "/home";
+				}
+				// 회원가입 실패
+				else {
+					alert(data.REPL_PAGE_MSG);
+				}
+			})
+			.catch(error => {
+				console.error('회원가입 오류 발생', error);
+			})
+
+	}
+
+
+</script>
+
+</html>

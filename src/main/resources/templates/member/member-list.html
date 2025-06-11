@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>List</title>
+    <meta charset="UTF-8">
+</head>
+<body>
+    <h1>회원 리스트</h1>
+    <form th:action="@{/user/list}" method="get">
+        <input type="hidden" id="pageNum" name="pageNum" />
+        <div>
+            <label for="searchUserId">사용자 아이디 검색:</label>
+            <input type="text" id="searchUserId" name="searchUserId" placeholder="사용자 아이디 검색" />
+            <label for="searchUserEmail">사용자 이메일 검색:</label>
+            <input type="text" id="searchUserEmail" name="searchUserEmail" placeholder="사용자 이메일 검색" />
+            <button type="submit">검색</button>
+        </div>
+    </form>
+
+    <table>
+        <thead>
+            <tr>
+                <th>사용자 번호</th>
+                <th>사용자 아이디</th>
+                <th>사용자 이름</th>
+                <th>사용자 이메일</th>
+                <th>등록일시</th>
+                <th>수정일시</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="user_info : ${result.USER_LIST}" >
+				<td><a class="url-link" th:href="@{'/user/detail/' + ${user_info.user_seq}}" th:text="${user_info.user_seq}"></a></td>
+				<td th:text="${user_info.user_id}"></td>
+				<td th:text="${user_info.user_nm}"></td>
+				<td th:text="${user_info.user_email}"></td>
+				<td th:text="${user_info.reg_dt}"></td>
+				<td th:text="${user_info.mod_dt}"></td>
+            </tr>
+        </tbody>
+    </table>
+
+    <ul class="pagination">        
+        <!-- 페이지 번호 반복 -->
+        <li th:each="page : ${result.pagingMap.PAGE_BLOCK_LIST}" th:classappend="${page} == ${result.pagingMap.PAGE_NUM} ? 'active'">
+            <a th:href="@{/user/list(pageNum=${page}, searchUserId=${result.paramsMap.searchUserId}, searchUserEmail=${result.paramsMap.searchUserEmail})}" th:text="${page}"></a>
+        </li>
+    </ul>
+</body>
+
+</html>
